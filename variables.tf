@@ -57,9 +57,3 @@ variable "instance_number" {
     error_message = "instance_number must be exactly 3 digits (for example: 001)."
   }
 }
-
-variable "tags" {
-  description = "Additional tags to apply to all resources."
-  type        = map(string)
-  default     = {}
-}
