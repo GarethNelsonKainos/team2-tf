@@ -1,7 +1,7 @@
 variable "resource_group_name" {
   description = "Optional explicit resource group name. If null, the name is generated from project_name, environment, and instance_number."
   type        = string
-  default     = null
+  default     = "rg-nick-team2-001"
   nullable    = true
 
   validation {
