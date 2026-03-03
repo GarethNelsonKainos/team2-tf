@@ -1,0 +1,11 @@
+# Copy this file to terraform.tfvars and update with your actual values
+
+resource_group_name = "rg-myteam-dev"
+location            = "uksouth"
+environment         = "dev"
+
+acr_image1_repo = "myregistry.azurecr.io/frontend-app"
+acr_image1_tag  = "latest"
+
+acr_image2_repo = "myregistry.azurecr.io/backend-app"
+acr_image2_tag  = "latest"
