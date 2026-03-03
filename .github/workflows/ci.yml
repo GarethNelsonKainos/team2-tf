@@ -1,0 +1,46 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+        - main
+  push:
+    branches: 
+        - "**"
+ 
+jobs:
+  Terraform-Plan:
+          needs: Containerise
+          runs-on: ubuntu-latest
+          env:
+            ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+            ARM_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+            ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+            ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+            ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+          steps:
+            - uses: actions/checkout@v3
+            - uses: hashicorp/setup-terraform@v2
+            - run: terraform init
+            - run: terraform plan
+
+  Terraform-Apply:
+      needs: Terraform-Plan
+      runs-on: ubuntu-latest
+      env:
+        ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+        ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
