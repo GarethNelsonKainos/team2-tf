@@ -10,6 +10,7 @@ terraform {
     resource_group_name  = "terraform-state-rg"
     storage_account_name = "tfstatedavidohanlon"
     container_name       = "tfstate"
+    use_azuread_auth     = true
     # key is passed at init time via -backend-config
   }
 }
