@@ -35,9 +35,8 @@ jobs:
       - name: Azure Login (Service Principal)
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.CLIENT_ID }}
-          tenant-id: ${{ secrets.TENANT_ID }}
-          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+          creds: >-
+            {"clientId":"${{ secrets.CLIENT_ID }}","clientSecret":"${{ secrets.CLIENT_SECRET }}","subscriptionId":"${{ secrets.SUBSCRIPTION_ID }}","tenantId":"${{ secrets.TENANT_ID }}"}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -84,9 +83,8 @@ jobs:
       - name: Azure Login (Service Principal)
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.CLIENT_ID }}
-          tenant-id: ${{ secrets.TENANT_ID }}
-          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+          creds: >-
+            {"clientId":"${{ secrets.CLIENT_ID }}","clientSecret":"${{ secrets.CLIENT_SECRET }}","subscriptionId":"${{ secrets.SUBSCRIPTION_ID }}","tenantId":"${{ secrets.TENANT_ID }}"}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
