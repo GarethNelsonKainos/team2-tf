@@ -16,7 +16,7 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
-  ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+  ARM_USE_AZUREAD: "true"
 
 defaults:
   run:
