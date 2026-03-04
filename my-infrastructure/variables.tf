@@ -135,3 +135,27 @@ variable "acr_image2_tag" {
     error_message = "acr_image2_tag must not be empty."
   }
 }
+
+variable "frontend_app_name" {
+  description = "Frontend Container App name."
+  type        = string
+  default     = "ca-team2-frontend-dev"
+}
+
+variable "frontend_target_port" {
+  description = "Frontend container listening port."
+  type        = number
+  default     = 80
+}
+
+variable "backend_app_name" {
+  description = "Backend Container App name."
+  type        = string
+  default     = "ca-team2-backend-dev"
+}
+
+variable "backend_target_port" {
+  description = "Backend container listening port."
+  type        = number
+  default     = 8080
+}

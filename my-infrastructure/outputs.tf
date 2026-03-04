@@ -77,3 +77,23 @@ output "acr_image2" {
   description = "Fully qualified ACR image 2 reference."
   value       = "${var.acr_image2_repo}:${var.acr_image2_tag}"
 }
+
+output "frontend_app_fqdn" {
+  description = "Frontend Container App public URL (external ingress enabled)."
+  value       = module.frontend_app.fqdn
+}
+
+output "frontend_app_id" {
+  description = "Frontend Container App resource ID."
+  value       = module.frontend_app.id
+}
+
+output "backend_app_fqdn" {
+  description = "Backend Container App internal URL (external ingress disabled)."
+  value       = module.backend_app.fqdn
+}
+
+output "backend_app_id" {
+  description = "Backend Container App resource ID."
+  value       = module.backend_app.id
+}

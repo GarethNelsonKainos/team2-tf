@@ -15,3 +15,9 @@ acr_image1_tag  = "latest"
 
 acr_image2_repo = "myregistry.azurecr.io/backend-app"
 acr_image2_tag  = "latest"
+
+frontend_app_name   = "ca-team2-frontend-dev"
+frontend_target_port = 80
+
+backend_app_name    = "ca-team2-backend-dev"
+backend_target_port  = 8080
