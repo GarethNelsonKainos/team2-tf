@@ -11,6 +11,9 @@ on:
 jobs:
   Terraform-Plan:
       runs-on: ubuntu-latest
+      defaults:
+        run:
+          working-directory: my-infrastructure
       env:
         ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
@@ -20,12 +23,15 @@ jobs:
       steps:
         - uses: actions/checkout@v3
         - uses: hashicorp/setup-terraform@v2
-        - run: terraform init
-        - run: terraform plan
+        - run: terraform init -input=false
+        - run: terraform plan -input=false -no-color -out tfplan
 
   Terraform-Apply:
       needs: Terraform-Plan
       runs-on: ubuntu-latest
+      defaults:
+        run:
+          working-directory: my-infrastructure
       env:
         ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
@@ -40,6 +46,9 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init -input=false
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
