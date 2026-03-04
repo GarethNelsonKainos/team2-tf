@@ -8,6 +8,7 @@
 *.tfvars
 *.tfvars.json
 # Terraform plan output
+tfplan
 *.tfplan
 plan.out
 # Crash logs
