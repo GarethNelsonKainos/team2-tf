@@ -1,9 +1,11 @@
-name: CI/CD Pipeline
+name: Terraform Deploy
 
 on:
+  repository_dispatch:
+    types: [image-pushed]     # triggered by the application repo after ACR push
   push:
     branches:
-      - "**"
+      - "**"                  # also runs on direct pushes for development/testing
   pull_request:
     branches:
       - main
@@ -16,20 +18,9 @@ env:
   ARM_USE_AZUREAD: "true"
 
 jobs:
-  build:
-    name: Build and Push to ACR
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Placeholder - ACR build steps to be added
-        run: echo "ACR build and push steps will go here"
-
   terraform:
     name: Terraform
     runs-on: ubuntu-latest
-    needs: build                          # waits for build to succeed first
     defaults:
       run:
         working-directory: terraform-azure-project
@@ -57,8 +48,10 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan   # always runs — on every branch
+        run: terraform plan -out=tfplan
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve tfplan   # only on main, uses saved plan
+        if: |
+          (github.event_name == 'repository_dispatch') ||
+          (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        run: terraform apply -auto-approve tfplan
