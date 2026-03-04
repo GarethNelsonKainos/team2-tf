@@ -201,6 +201,10 @@ module "backend_app" {
     {
       name = "DATABASE_URL"
       value = "postgresql://sam@localhost:5432/postgres?schema=job_roles_db"
+    },
+    {
+      name = "PORT"
+      value = "8080"
     }
   ]
 
