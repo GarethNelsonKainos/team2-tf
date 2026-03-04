@@ -65,7 +65,7 @@ resource "azurerm_container_app_environment" "main" {
 
 # RBAC: Grant managed identity AcrPull on ACR
 resource "azurerm_role_assignment" "acr_pull" {
-  scope                = data.azurerm_container_registry.main.id
+  scope                = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.acr_resource_group_name}/providers/Microsoft.ContainerRegistry/registries/${var.acr_name}"
   role_definition_name = "AcrPull"
   principal_id         = azurerm_user_assigned_identity.container_apps.principal_id
   principal_type       = "ServicePrincipal"

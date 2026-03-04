@@ -60,12 +60,12 @@ output "container_app_environment_default_domain" {
 
 output "acr_login_server" {
   description = "Azure Container Registry login server URL."
-  value       = data.azurerm_container_registry.main.login_server
+  value       = local.acr_login_server
 }
 
 output "acr_id" {
   description = "Azure Container Registry resource ID."
-  value       = data.azurerm_container_registry.main.id
+  value       = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.acr_resource_group_name}/providers/Microsoft.ContainerRegistry/registries/${var.acr_name}"
 }
 
 output "acr_image1" {
