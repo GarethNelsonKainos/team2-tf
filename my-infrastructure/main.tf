@@ -10,10 +10,9 @@ module "resource_group" {
 
 data "azurerm_client_config" "current" {}
 
-# Lookup existing ACR
-data "azurerm_container_registry" "main" {
-  name                = var.acr_name
-  resource_group_name = var.acr_resource_group_name
+# Compute ACR login server without data source (avoids listCredentials permission)
+locals {
+  acr_login_server = "${var.acr_name}.azurecr.io"
 }
 
 resource "azurerm_key_vault" "main" {
@@ -88,7 +87,7 @@ module "frontend_app" {
   resource_group_name          = module.resource_group.name
   container_app_environment_id = azurerm_container_app_environment.main.id
   managed_identity_id          = azurerm_user_assigned_identity.container_apps.id
-  registry_server              = data.azurerm_container_registry.main.login_server
+  registry_server              = local.acr_login_server
   container_name               = "frontend"
   image_repo                   = var.acr_image1_repo
   image_tag                    = var.acr_image1_tag
@@ -162,7 +161,7 @@ module "backend_app" {
   resource_group_name          = module.resource_group.name
   container_app_environment_id = azurerm_container_app_environment.main.id
   managed_identity_id          = azurerm_user_assigned_identity.container_apps.id
-  registry_server              = data.azurerm_container_registry.main.login_server
+  registry_server              = local.acr_login_server
   container_name               = "backend"
   image_repo                   = var.acr_image2_repo
   image_tag                    = var.acr_image2_tag
