@@ -21,10 +21,17 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
         ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
       steps:
-        - uses: actions/checkout@v3
-        - uses: hashicorp/setup-terraform@v2
+        - uses: actions/checkout@v4
+        - uses: hashicorp/setup-terraform@v3
+          with:
+            terraform_version: 1.9.8
         - run: terraform init -input=false
         - run: terraform plan -input=false -no-color -out tfplan
+        - name: Upload Terraform plan
+          uses: actions/upload-artifact@v4
+          with:
+            name: tfplan
+            path: my-infrastructure/tfplan
 
   Terraform-Apply:
       needs: Terraform-Plan
@@ -43,9 +50,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.0
+          terraform_version: 1.9.8
+
+      - name: Download Terraform plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: my-infrastructure
 
       - name: Terraform Init
         run: terraform init -input=false
