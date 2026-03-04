@@ -1,0 +1,12 @@
+# modules/azure/main.tf
+
+resource "azurerm_resource_group" "main" {
+  name     = "${var.resource_group_name}-${var.environment}"
+  location = var.location
+
+  tags = {
+    environment = var.environment
+    managed_by  = "terraform"
+    project     = "kainos-academy"
+  }
+}
