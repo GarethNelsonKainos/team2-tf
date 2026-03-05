@@ -21,8 +21,8 @@ locals {
   acr_image2 = "team2-back-app"
   acr_image1_tag        = "latest"
   acr_image2_tag        = "latest"
-  acr_image1_repo       = "${local.acr_login_server}/${local.acr_image1}:${local.acr_image1_tag}"
-  acr_image2_repo       = "${local.acr_login_server}/${local.acr_image2}:${local.acr_image2_tag}"
+  acr_image1_repo       = "${local.acr_login_server}/${local.acr_image1}"
+  acr_image2_repo       = "${local.acr_login_server}/${local.acr_image2}"
 }
 
 resource "azurerm_key_vault" "main" {
