@@ -13,6 +13,16 @@ data "azurerm_client_config" "current" {}
 # Compute ACR login server without data source (avoids listCredentials permission)
 locals {
   acr_login_server = "${var.acr_name}.azurecr.io"
+  backend_app_name    = "ca-team2-backend-dev"
+  backend_target_port  = 8080
+  frontend_app_name   = "ca-team2-frontend-dev"
+  frontend_target_port = 80
+  acr_image1 = "team2-front-app"
+  acr_image2 = "team2-back-app"
+  acr_image1_tag        = "latest"
+  acr_image2_tag        = "latest"
+  acr_image1_repo       = "${local.acr_login_server}/${local.acr_image1}:${local.acr_image1_tag}"
+  acr_image2_repo       = "${local.acr_login_server}/${local.acr_image2}:${local.acr_image2_tag}"
 }
 
 resource "azurerm_key_vault" "main" {
@@ -34,18 +44,6 @@ resource "azurerm_user_assigned_identity" "container_apps" {
   name                = var.container_apps_identity_name
   location            = module.resource_group.location
   resource_group_name = module.resource_group.name
-
-  tags = {
-    environment = var.environment
-  }
-}
-
-resource "azurerm_log_analytics_workspace" "main" {
-  name                = var.log_analytics_workspace_name
-  location            = module.resource_group.location
-  resource_group_name = module.resource_group.name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
 
   tags = {
     environment = var.environment
@@ -83,19 +81,19 @@ resource "azurerm_role_assignment" "keyvault_secrets_user" {
 module "frontend_app" {
   source = "../modules/container-app"
 
-  name                         = var.frontend_app_name
+  name                         = local.frontend_app_name
   resource_group_name          = module.resource_group.name
   container_app_environment_id = azurerm_container_app_environment.main.id
   managed_identity_id          = azurerm_user_assigned_identity.container_apps.id
   registry_server              = local.acr_login_server
   container_name               = "frontend"
-  image_repo                   = var.acr_image1_repo
-  image_tag                    = var.acr_image1_tag
+  image_repo                   = local.acr_image1_repo
+  image_tag                    = local.acr_image1_tag
   cpu                          = 0.5
   memory                       = "1Gi"
   enable_ingress               = true
   external_enabled             = true
-  target_port                  = var.frontend_target_port
+  target_port                  = local.frontend_target_port
 
   # Feature flag example - plain text env vars for easy toggling
   env_vars = [
@@ -157,19 +155,19 @@ module "frontend_app" {
 module "backend_app" {
   source = "../modules/container-app"
 
-  name                         = var.backend_app_name
+  name                         = local.backend_app_name
   resource_group_name          = module.resource_group.name
   container_app_environment_id = azurerm_container_app_environment.main.id
   managed_identity_id          = azurerm_user_assigned_identity.container_apps.id
   registry_server              = local.acr_login_server
   container_name               = "backend"
-  image_repo                   = var.acr_image2_repo
-  image_tag                    = var.acr_image2_tag
+  image_repo                   = local.acr_image2_repo
+  image_tag                    = local.acr_image2_tag
   cpu                          = 0.5
   memory                       = "1Gi"
   enable_ingress               = true
   external_enabled             = false  # Internal only
-  target_port                  = var.backend_target_port
+  target_port                  = local.backend_target_port
 
   # Feature flag and app config
   env_vars = [
@@ -203,7 +201,7 @@ module "backend_app" {
     },
     {
       name = "PORT"
-      value = "8080"
+      value = local.backend_target_port
     }
   ]
 

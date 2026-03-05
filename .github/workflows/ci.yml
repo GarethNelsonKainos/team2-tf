@@ -25,6 +25,8 @@ jobs:
         - uses: hashicorp/setup-terraform@v3
           with:
             terraform_version: 1.9.8
+        - name: Write tfvars from secret
+          run: echo "${{ secrets.TERRAFORM_TFVARS }}" > terraform.tfvars
         - run: terraform init -input=false
         - run: terraform plan -input=false -no-color -out tfplan
         - name: Upload Terraform plan
@@ -53,6 +55,9 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.8
+      
+      - name: Write tfvars from secret
+        run: echo "${{ secrets.TERRAFORM_TFVARS }}" > terraform.tfvars
 
       - name: Download Terraform plan
         uses: actions/download-artifact@v4
