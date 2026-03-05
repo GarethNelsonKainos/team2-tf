@@ -43,11 +43,6 @@ output "container_apps_identity_client_id" {
   value       = azurerm_user_assigned_identity.container_apps.client_id
 }
 
-output "log_analytics_workspace_id" {
-  description = "Log Analytics workspace ID."
-  value       = azurerm_log_analytics_workspace.main.id
-}
-
 output "container_app_environment_id" {
   description = "Container App Environment resource ID."
   value       = azurerm_container_app_environment.main.id
