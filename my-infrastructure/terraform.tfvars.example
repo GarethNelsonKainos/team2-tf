@@ -7,7 +7,6 @@ key_vault_name      = "kvteam2devexample01"
 acr_name            = "myacrregistry"
 acr_resource_group_name = "rg-acr"
 container_apps_identity_name = "id-team2-ca-dev"
-log_analytics_workspace_name = "log-team2-ca-dev"
 container_app_environment_name = "cae-team2-dev"
 
 acr_image1_repo = "myregistry.azurecr.io/frontend-app"

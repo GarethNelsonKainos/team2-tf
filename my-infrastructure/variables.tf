@@ -70,17 +70,6 @@ variable "container_apps_identity_name" {
   }
 }
 
-variable "log_analytics_workspace_name" {
-  description = "Log Analytics workspace name for Container Apps environment logging."
-  type        = string
-  default     = "log-team2-ca-dev"
-
-  validation {
-    condition     = length(trimspace(var.log_analytics_workspace_name)) > 0
-    error_message = "log_analytics_workspace_name must not be empty."
-  }
-}
-
 variable "container_app_environment_name" {
   description = "Container App Environment name."
   type        = string
