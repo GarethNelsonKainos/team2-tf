@@ -54,7 +54,6 @@ resource "azurerm_container_app_environment" "main" {
   name                       = var.container_app_environment_name
   location                   = module.resource_group.location
   resource_group_name        = module.resource_group.name
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
 
   tags = {
     environment = var.environment
