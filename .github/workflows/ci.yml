@@ -1,0 +1,72 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+        - main
+  push:
+    branches:
+        - "**"
+ 
+jobs:
+  Terraform-Plan:
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+          working-directory: my-infrastructure
+      env:
+        ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+        ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+      steps:
+        - uses: actions/checkout@v4
+        - uses: hashicorp/setup-terraform@v3
+          with:
+            terraform_version: 1.9.8
+        - name: Write tfvars from secret
+          run: echo "${{ secrets.TERRAFORM_TFVARS }}" > terraform.tfvars
+        - run: terraform init -input=false
+        - run: terraform plan -input=false -no-color -out tfplan
+        - name: Upload Terraform plan
+          uses: actions/upload-artifact@v4
+          with:
+            name: tfplan
+            path: my-infrastructure/tfplan
+
+  Terraform-Apply:
+      needs: Terraform-Plan
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+          working-directory: my-infrastructure
+      env:
+        ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+        ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+      
+      - name: Write tfvars from secret
+        run: echo "${{ secrets.TERRAFORM_TFVARS }}" > terraform.tfvars
+
+      - name: Download Terraform plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: my-infrastructure
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan

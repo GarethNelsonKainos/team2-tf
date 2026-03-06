@@ -1,0 +1,22 @@
+# Copy this file to terraform.tfvars and update with your actual values
+
+resource_group_name = "rg-myteam-dev"
+location            = "uksouth"
+environment         = "dev"
+key_vault_name      = "kvteam2devexample01"
+acr_name            = "myacrregistry"
+acr_resource_group_name = "rg-acr"
+container_apps_identity_name = "id-team2-ca-dev"
+container_app_environment_name = "cae-team2-dev"
+
+acr_image1_repo = "myregistry.azurecr.io/frontend-app"
+acr_image1_tag  = "latest"
+
+acr_image2_repo = "myregistry.azurecr.io/backend-app"
+acr_image2_tag  = "latest"
+
+frontend_app_name   = "ca-team2-frontend-dev"
+frontend_target_port = 80
+
+backend_app_name    = "ca-team2-backend-dev"
+backend_target_port  = 8080
