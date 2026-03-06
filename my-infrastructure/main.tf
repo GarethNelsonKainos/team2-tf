@@ -19,10 +19,15 @@ locals {
   frontend_target_port = 80
   acr_image1 = "team2-front-app"
   acr_image2 = "team2-back-app"
+  acr_image3 = "team2-postgres"
   acr_image1_tag        = "latest"
   acr_image2_tag        = "latest"
+  acr_image3_tag        = "latest"
   acr_image1_repo       = "${local.acr_login_server}/${local.acr_image1}"
   acr_image2_repo       = "${local.acr_login_server}/${local.acr_image2}"
+  acr_image3_repo       = "${local.acr_login_server}/${local.acr_image3}"
+  postgres_app_name     = "ca-team2-postgres-dev"
+  postgres_target_port  = 5432
 }
 
 resource "azurerm_key_vault" "main" {
@@ -106,7 +111,7 @@ module "frontend_app" {
     },
     {
     name  = "API_BASE_URL"
-    value = module.backend_app.fqdn  # e.g., https://ca-team2-backend-dev--xxx.internal.managosea...
+    value = "https://${module.backend_app.fqdn}"
     },
     {
       name  = "CURRENT_HOST"
@@ -195,12 +200,12 @@ module "backend_app" {
       value = "us-east-1"
     },
     {
-      name = "DATABASE_URL"
-      value = "postgresql://sam@localhost:5432/postgres?schema=job_roles_db"
+      name  = "DATABASE_URL"
+      value = "postgresql://managed:Password123!@${azurerm_container_app.postgres.ingress[0].fqdn}:5432/job_roles_db?schema=job_roles_db"
     },
     {
-      name = "PORT"
-      value = local.backend_target_port
+      name  = "PORT"
+      value = tostring(local.backend_target_port)
     }
   ]
 
@@ -242,6 +247,72 @@ module "backend_app" {
 
   depends_on = [
     azurerm_role_assignment.acr_pull,
-    azurerm_role_assignment.keyvault_secrets_user
+    azurerm_role_assignment.keyvault_secrets_user,
+    azurerm_container_app.postgres
+  ]
+}
+
+# Postgres Container App (TCP ingress, internal only)
+resource "azurerm_container_app" "postgres" {
+  name                         = local.postgres_app_name
+  container_app_environment_id = azurerm_container_app_environment.main.id
+  resource_group_name          = module.resource_group.name
+  revision_mode                = "Single"
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.container_apps.id]
+  }
+
+  registry {
+    server   = local.acr_login_server
+    identity = azurerm_user_assigned_identity.container_apps.id
+  }
+
+  template {
+    container {
+      name   = "postgres"
+      image  = "${local.acr_image3_repo}:${local.acr_image3_tag}"
+      cpu    = 0.5
+      memory = "1Gi"
+
+      env {
+        name  = "POSTGRES_USER"
+        value = "managed"
+      }
+
+      env {
+        name  = "POSTGRES_PASSWORD"
+        value = "Password123!"
+      }
+
+      env {
+        name  = "POSTGRES_DB"
+        value = "job_roles_db"
+      }
+    }
+
+    min_replicas = 1
+    max_replicas = 1
+  }
+
+  ingress {
+    external_enabled = false
+    target_port      = 5432
+    exposed_port     = 5432
+    transport        = "tcp"
+    traffic_weight {
+      latest_revision = true
+      percentage      = 100
+    }
+  }
+
+  tags = {
+    environment = var.environment
+    app         = "postgres"
+  }
+
+  depends_on = [
+    azurerm_role_assignment.acr_pull
   ]
 }
